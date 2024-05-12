@@ -1,7 +1,7 @@
 import React, { useReducer } from "react";
 import "./App.css";
 import DigitButton from "./components/DigitButton";
-import { OperationButton } from "./components/OperationButton";
+import OperationButton from "./components/OperationButton";
 
 export const ACTIONS = {
   ADD_DIGIT: "add-digit",
@@ -14,13 +14,19 @@ export const ACTIONS = {
 const reducer = (state, { type, payload }) => {
   switch (type) {
     case ACTIONS.ADD_DIGIT:
+      if (payload.digit === "0" && state.currentOperand === "0") {
+        return state;
+      }
+      if (payload.digit === "." && state.currentOperand.includes(".")) {
+        return state;
+      }
       return {
         ...state,
-        currentOperand: `${currentOperand || ""}${payload}`, // Access payload directly
+        currentOperand: `${state.currentOperand || ""}${payload.digit}`, // Use state.currentOperand
       };
-
-
-
+    case ACTIONS.CLEAR:
+      return {};
+    // other cases
     default:
       return state;
   }
@@ -41,7 +47,12 @@ const App = () => {
         <div className="current-operand">{currentOperand}</div>
       </div>
 
-      <button className="span-two">AC</button>
+      <button
+        className="span-two"
+        onClick={() => dispatch({ type: ACTIONS.CLEAR })}
+      >
+        AC
+      </button>
       <button>DEL</button>
       <OperationButton operation="÷" dispatch={dispatch} />
       <DigitButton digit="1" dispatch={dispatch} />
